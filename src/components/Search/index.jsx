@@ -1,13 +1,16 @@
 import debounce from 'lodash.debounce';
 import React, { useCallback, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setValueSearch } from '../../redux/slices/searchSlice';
 import styles from './Search.module.scss';
 export default function Search() {
-  const [value, setValue] = useState('');
+  const dispatch = useDispatch();
+  const [value, setValue] = useState();
   const updateSearchValue = useCallback(
     debounce((str) => {
-      console.log(str);
-    }, 1000),
-    [value],
+      dispatch(setValueSearch(str));
+    }, 150),
+    [],
   );
   const onChangeInput = (e) => {
     setValue(e.target.value);

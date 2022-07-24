@@ -2,10 +2,15 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import CartItem from '../components/CartItem';
 import { clearItems } from '../redux/slices/cartSlice';
-
+import { Link } from 'react-router-dom';
 export default function Cart() {
   const dispatch = useDispatch();
   const items = useSelector((state) => state.cart.items);
+  const totalPrice = useSelector((state) => state.cart.totalPrice)
+  const quantity = items.reduce( (sum, obj) => {
+    return sum + obj.count
+  }, 0);
+
   return (
     <div class="container container--cart">
       <div class="cart">
@@ -91,11 +96,11 @@ export default function Cart() {
           <div class="cart__bottom-details">
             <span>
               {' '}
-              Всего пицц: <b>3 шт.</b>{' '}
+              Всего пицц: <b>{quantity} шт.</b>{' '}
             </span>
             <span>
               {' '}
-              Сумма заказа: <b>900 ₽</b>{' '}
+              Сумма заказа: <b>{totalPrice} ₽</b>{' '}
             </span>
           </div>
           <div class="cart__bottom-buttons">
@@ -115,7 +120,7 @@ export default function Cart() {
                 />
               </svg>
 
-              <span>Вернуться назад</span>
+              <Link to = '/'>Вернуться назад</Link>
             </a>
             <div class="button pay-btn">
               <span>Оплатить сейчас</span>

@@ -2,20 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Categories from '../components/Categories';
 import Pizza from '../components/Pizza';
 import PizzaSkeleton from '../components/Pizza/PizzaSkeleton';
-import Sort, { sortNames } from '../components/Sort';
+import Sort from '../components/Sort';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
-import { setCategoryId, setFilters } from '../redux/slices/filterSlice';
-import debounce from 'lodash.debounce';
-import QueryString from 'qs';
-import qs from 'qs';
-import { useNavigate } from 'react-router-dom';
+import { setCategoryId } from '../redux/slices/filterSlice';
 export default function Home() {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const categoryId = useSelector((state) => state.filter.categoryId);
   const sortType = useSelector((state) => state.filter.sortType);
-
+  const { valueSearch } = useSelector((state) => state.search);
   const [items, setItems] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,10 +24,14 @@ export default function Home() {
       .get(
         `https://62d7e8c49c8b5185c77eb125.mockapi.io/items?${
           categoryId > 0 ? `category=${categoryId}` : ''
-        }&sortBy=${sortType.sort}&order=desc`,
+        }&sortBy=${sortType.sort}&order=desc&search=${valueSearch}`,
       )
-      .then(({ data }) => finalLoading(data));
-  }, [categoryId, sortType]);
+      .then(({ data }) => finalLoading(data))
+      .catch((err) => {
+        setIsLoading(false);
+      });
+    window.scrollTo(0, 0);
+  }, [categoryId, sortType, valueSearch]);
 
   return (
     <div className="content">
