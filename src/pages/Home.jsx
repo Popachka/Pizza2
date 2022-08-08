@@ -1,35 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Categories from '../components/Categories';
 import Pizza from '../components/Pizza';
 import PizzaSkeleton from '../components/Pizza/PizzaSkeleton';
 import Sort from '../components/Sort';
-import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux/es/exports';
 import { setCategoryId } from '../redux/slices/filterSlice';
+import { fetchPizzas } from '../redux/slices/pizzaSlice';
+import { Link } from 'react-router-dom';
+
 export default function Home() {
   const dispatch = useDispatch();
   const categoryId = useSelector((state) => state.filter.categoryId);
   const sortType = useSelector((state) => state.filter.sortType);
+  const { items, status } = useSelector((state) => state.pizza);
   const { valueSearch } = useSelector((state) => state.search);
-  const [items, setItems] = useState();
-  const [isLoading, setIsLoading] = useState(true);
-
-  const finalLoading = (data) => {
-    setItems(data);
-    setIsLoading(false);
-  };
   useEffect(() => {
-    setIsLoading(true);
-    axios
-      .get(
-        `https://62d7e8c49c8b5185c77eb125.mockapi.io/items?${
-          categoryId > 0 ? `category=${categoryId}` : ''
-        }&sortBy=${sortType.sort}&order=desc&search=${valueSearch}`,
-      )
-      .then(({ data }) => finalLoading(data))
-      .catch((err) => {
-        setIsLoading(false);
-      });
+    const sortTypes = sortType.sort;
+
+    dispatch(fetchPizzas({ sortTypes, categoryId, valueSearch }));
     window.scrollTo(0, 0);
   }, [categoryId, sortType, valueSearch]);
 
@@ -42,7 +30,7 @@ export default function Home() {
         </div>
         <h2 className="content__title">Все пиццы</h2>
         <div className="content__items">
-          {isLoading
+          {status === 'loading'
             ? [...new Array(6)].map((_, index) => {
                 return <PizzaSkeleton key={index} />;
               })
